@@ -2,7 +2,7 @@ import sys
 import pygame
 import random
 
-pygame.init
+pygame.init()
 pygame.mixer.init()
 
 background = pygame.image.load('./img/background.png')
@@ -31,7 +31,7 @@ def scoreScreen(frame, text, size, x,y):
     font = pygame.font.SysFont('Small Fonts', size, bold=True)
     textFrame = font.render(text, True, white,black)
     textRect = textFrame.get_rect()
-    textRect.midtop(x,y)
+    textRect.midtop = (x,y)
     frame.blit(textFrame, textRect)
     
 def lifeBar(frame, x,y, level):
@@ -66,7 +66,7 @@ class Player (pygame.sprite.Sprite):
         if self.rect.right > width:
             self.rect.right = width
         elif self.rect.left < 0:
-            self.rect,left = 0
+            self.rect.left = 0
             
     def piupiu(self):
         bullet = BulletPlayer(self.rect.centerx, self.rect.top)
@@ -159,7 +159,7 @@ playerGroup.add(player)
 bulletPlayer.add(player)
 
 for x in range(10):
-    invader = Invaders(10,10)
+    invader = Invaders(x * 50, 10)
     invaderGroup.add(invader)
     playerGroup.add(invader)
     
@@ -184,7 +184,7 @@ while run:
     impactPB = pygame.sprite.groupcollide(invaderGroup, bulletPlayer,True,True)
     for i in impactPB:
         score+=10
-        invader.piupiuInvaders()
+        i.piupiuInvaders()
         invader = Invaders(300,10)
         invaderGroup.add(invader)
         playerGroup.add(invader)
@@ -212,8 +212,9 @@ while run:
         if player.life <= 0:
             run = False
             
-    scoreScreen(window, (' SCORE: '+str(score)+'         '), 30, width-85, 2)
+    scoreScreen(window, (' SCORE: '+ str(score)+'         '), 30, width-85, 2)
     lifeBar(window, width-285, 0, player.life)
     
     pygame.display.flip()
+    
 pygame.quit()
