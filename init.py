@@ -27,6 +27,12 @@ life = 100
 white = (255,255,255)
 black = (0,0,0)
 
+levels = [
+    {'invasor_count': 5, 'invasor_speed': 2, 'player_lives': 3},
+    {'invasor_count': 8, 'invasor_speed': 3, 'player_lives': 3},
+    {'invasor_count': 10, 'invasor_speed': 4, 'player_lives': 3},
+]
+
 def scoreScreen(frame, text, size, x,y):
     font = pygame.font.SysFont('Small Fonts', size, bold=True)
     textFrame = font.render(text, True, white,black)
@@ -42,6 +48,35 @@ def lifeBar(frame, x,y, level):
     fill = pygame.Rect(x,y,fill, alto)
     pygame.draw.rect(frame, (255,0,55),fill)
     pygame.draw.rect(frame, black, border,4)
+    
+def load_level(level_data):
+    invasor_count = level_data.get('invasor_count', 10)
+    invasor_speed = level_data.get('invasor_speed', 2)
+    player_lives = level_data.get('player_lives', 3)
+
+    print(f"Cargando Nivel:")
+    print(f"Invasores: {invasor_count}")
+    print(f"Velocidad de Invasores: {invasor_speed}")
+    print(f"Vidas del Jugador: {player_lives}")
+    print("-----------------------")
+
+    playerGroup.empty()
+    invaderGroup.empty()
+    bulletPlayer.empty()
+    bulletInvaders.empty()
+
+    player = Player()
+    playerGroup.add(player)
+    bulletPlayer.add(player)
+
+    for _ in range(invasor_count):
+        invader = Invaders(random.randrange(1, width - 50), 10)
+        invaderGroup.add(invader)
+        playerGroup.add(invader)
+        
+def all_invasors_destroyed():
+    return len(invaderGroup) == 0
+
     
 class Player (pygame.sprite.Sprite):
     def __init__(self):
@@ -162,6 +197,9 @@ for x in range(10):
     invader = Invaders(x * 50, 10)
     invaderGroup.add(invader)
     playerGroup.add(invader)
+
+current_level = 0
+load_level(levels[current_level])
     
 while run:
     clock.tick(fps)
@@ -181,6 +219,15 @@ while run:
     
     playerGroup.draw(window)
     
+    if all_invasors_destroyed():
+        current_level += 1
+        if current_level < len(levels):
+            level_data = levels[current_level]
+            load_level(level_data)
+        else:
+            print("¡Has completado todos los niveles!")
+            run = False
+            
     impactPB = pygame.sprite.groupcollide(invaderGroup, bulletPlayer,True,True)
     for i in impactPB:
         score+=10
